@@ -19086,12 +19086,6 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
   };
 })(window, document, "script");
 
-// Google ClientID
-var CLIENT_ID = "794561760101-j7k0bl1idfbfs8gqd3e40u7gal04nn79.apps.googleusercontent.com";
-
-// Google View ID
-var ids = "ga:166794794";
-
 // Options for a GoogleCharts
 var options = {
   title: 'Active Users',
@@ -19123,15 +19117,10 @@ definejs('GAActiveUsersWidget', function create() {
 
           var _this = _possibleConstructorReturn(this, (GAActiveUsersWidget.__proto__ || Object.getPrototypeOf(GAActiveUsersWidget)).call(this, props));
 
-          _this.handleClick = function (activeAttr) {
-            _this.setState({ activeAttr: activeAttr });
-            _this.loadAnalytics(activeAttr);
-          };
-
           _this.init = function () {
             var doAuth = function doAuth() {
               gapi.analytics.auth && gapi.analytics.auth.authorize({
-                clientid: CLIENT_ID,
+                clientid: _this.state.client_id,
                 container: _this.authButtonNode
               });
             };
@@ -19152,33 +19141,33 @@ definejs('GAActiveUsersWidget', function create() {
             var self = _this;
 
             // Metrics for GA queries
-            var metrics = ['1dayUsers', '7dayUsers', '30dayUsers'];
+            var attr = ['1dayUsers', '7dayUsers', '30dayUsers'];
 
-            var DAU = query({
-              'ids': ids,
+            var query1 = query({
+              'ids': _this.state.view_id,
               'dimensions': 'ga:date',
-              'metrics': 'ga:' + metrics[0],
+              'metrics': 'ga:' + attr[0],
               'start-date': '30daysAgo',
               'end-date': 'yesterday'
             });
 
-            var WAU = query({
-              'ids': ids,
+            var query2 = query({
+              'ids': _this.state.view_id,
               'dimensions': 'ga:date',
-              'metrics': 'ga:' + metrics[1],
+              'metrics': 'ga:' + attr[1],
               'start-date': '30daysAgo',
               'end-date': 'yesterday'
             });
 
-            var MAU = query({
-              'ids': ids,
+            var query3 = query({
+              'ids': _this.state.view_id,
               'dimensions': 'ga:date',
-              'metrics': 'ga:' + metrics[2],
+              'metrics': 'ga:' + attr[2],
               'start-date': '30daysAgo',
               'end-date': 'yesterday'
             });
 
-            Promise.all([DAU, WAU, MAU]).then(function (results) {
+            Promise.all([query1, query2, query3]).then(function (results) {
 
               var data1 = results[0].rows.map(function (row) {
                 return +row[1];
@@ -19205,6 +19194,8 @@ definejs('GAActiveUsersWidget', function create() {
             isEditing: _this.props.mode == 'edit' ? true : false,
             ready: false,
             activeAttr: 0,
+            client_id: _this.props.clientID, // Google ClientID
+            view_id: 'ga:' + _this.props.viewID, // Google View ID
             rows: [['', 0, 0, 0]]
           };
           return _this;

@@ -21,12 +21,6 @@ import '../../scss/GAActiveUsersWidget/GAActiveUsersWidget.scss';
   }
 })(window, document, "script")
 
-// Google ClientID
-const CLIENT_ID = "[client-id]"
-
-// Google View ID
-const ids = "ga:[view-id]"
-
 // Options for a GoogleCharts
 const options = {
   title: 'Active Users',
@@ -65,15 +59,12 @@ definejs('GAActiveUsersWidget', function create (){
                   isEditing: this.props.mode == 'edit' ? true : false,
                   ready: false,
                   activeAttr: 0,
+                  client_id: this.props.clientID, // Google Client ID
+                  view_id: `ga:${this.props.viewID}`, // Google View ID
                   rows: [
                     ['', 0, 0, 0]
                   ],
                 }
-              }
-
-              handleClick = (activeAttr) => {
-                this.setState({activeAttr})
-                this.loadAnalytics(activeAttr)
               }
 
               // Google account authorization
@@ -81,7 +72,7 @@ definejs('GAActiveUsersWidget', function create (){
                 const doAuth = () => {
                   gapi.analytics.auth &&
                   gapi.analytics.auth.authorize({
-                    clientid: CLIENT_ID,
+                    clientid: this.state.client_id,
                     container: this.authButtonNode,
                   });
                 }
@@ -103,33 +94,33 @@ definejs('GAActiveUsersWidget', function create (){
                 const self = this
 
                 // Metrics for GA queries
-                const metrics = ['1dayUsers', '7dayUsers', '30dayUsers']
+                const attr = ['1dayUsers', '7dayUsers', '30dayUsers']
 
-                const DAU = query({
-                  'ids': ids,
+                const query1 = query({
+                  'ids': this.state.view_id,
                   'dimensions': 'ga:date',
-                  'metrics': `ga:${metrics[0]}`,
+                  'metrics': `ga:${attr[0]}`,
                   'start-date': '30daysAgo',
                   'end-date': 'yesterday',
                 });
 
-                const WAU = query({
-                  'ids': ids,
+                const query2 = query({
+                  'ids': this.state.view_id,
                   'dimensions': 'ga:date',
-                  'metrics': `ga:${metrics[1]}`,
+                  'metrics': `ga:${attr[1]}`,
                   'start-date': '30daysAgo',
                   'end-date': 'yesterday',
                 });
 
-                const MAU = query({
-                  'ids': ids,
+                const query3 = query({
+                  'ids': this.state.view_id,
                   'dimensions': 'ga:date',
-                  'metrics': `ga:${metrics[2]}`,
+                  'metrics': `ga:${attr[2]}`,
                   'start-date': '30daysAgo',
                   'end-date': 'yesterday',
                 });
 
-                Promise.all([DAU, WAU, MAU]).then(function (results) {
+                Promise.all([query1, query2, query3]).then(function (results) {
 
                   var data1 = results[0].rows.map(function (row) {
                     return +row[1];
