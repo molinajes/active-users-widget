@@ -5,7 +5,7 @@ An upBoard widget to show Google Analytics Active Users report
 ## Installation
 
 ```
-git clone https://github.com/chesnok9/ga-active-users-widget
+git clone https://github.com/webdevcrazier/active-users-widget
 cd ga-active-users-widget
 npm install
 ```
